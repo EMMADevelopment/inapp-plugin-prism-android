@@ -1,0 +1,103 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.jfrog.artifactory'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.emma.io/emma' }
+}
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+dependencies {
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+
+    compileOnly 'io.emma:eMMaSDK:4.8.0'
+}
+
+Properties localProperties = new Properties()
+if (project.rootProject.file('local.properties').canRead()) {
+    localProperties.load(new FileInputStream(project.rootProject.file('local.properties')))
+}
+
+
+def optionalDependencies = []
+def excludeDependencies = []
+
+publishing {
+    publications {
+        aar(MavenPublication) {
+            groupId localProperties.packageName
+            version = project.properties.version
+            artifactId localProperties.projectName
+
+            artifact("$buildDir/outputs/aar/plugin_prism-release.aar")
+            pom.withXml {
+                def dependencies = asNode().appendNode('dependencies')
+                configurations.implementation.allDependencies.each {
+                    if (!it.name.equals('unspecified') && !excludeDependencies.contains(it.name)) {
+                        def dependency = dependencies.appendNode('dependency')
+                        dependency.appendNode('groupId', it.group)
+                        dependency.appendNode('artifactId', it.name)
+                        dependency.appendNode('version', it.version)
+
+                        if (optionalDependencies.contains(it.name)) {
+                            dependency.appendNode('optional', true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+artifactory {
+    contextUrl = localProperties.url
+    publish {
+        repository {
+            repoKey = localProperties.repoKey
+            username = localProperties.username
+            password = localProperties.password
+        }
+        defaults {
+            publications('aar')
+            publishArtifacts = true
+            publishBuildInfo = true
+            properties = ['qa.level': 'basic', 'dev.team': 'EMMA devels']
+            publishPom = true
+        }
+    }
+}

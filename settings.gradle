@@ -1,0 +1,3 @@
+include ':plugin_prism'
+include ':app'
+rootProject.name = "EMMAPluginPrism"
