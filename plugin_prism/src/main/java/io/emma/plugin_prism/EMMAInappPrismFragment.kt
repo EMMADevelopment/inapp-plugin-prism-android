@@ -18,15 +18,14 @@ import io.emma.android.controllers.EMMAImageController
 import io.emma.android.interfaces.EMMALoadImageInterface
 
 
-class EMMAInappPrismFragment: Fragment(), View.OnClickListener {
+class EMMAInappPrismFragment: Fragment(){
     companion object {
         private const val DURATION: Long = 500
         private const val DIRECTION_ARG = "direction"
 
-        fun newInstance(direction: Direction?): EMMAInappPrismFragment {
+        fun newInstance(): EMMAInappPrismFragment {
             val prismFragment = EMMAInappPrismFragment()
             prismFragment.arguments = Bundle()
-            prismFragment.arguments?.putSerializable(DIRECTION_ARG, direction)
             Log.d("DEBUG","paso por constructor")
             return prismFragment
         }
@@ -41,21 +40,23 @@ class EMMAInappPrismFragment: Fragment(), View.OnClickListener {
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_prism_side, container, false)
         val background = view.findViewById<ImageView>(R.id.background)
+        background.setBackgroundResource(android.R.color.white)
         //EMMAImageController.loadImage(activity, "https://loremflickr.com/350/750", background)
 
         Glide.with(activity!!)
-                .load("https://loremflickr.com/350/750")
+                .load("https://loremflickr.com/370/750")
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .centerCrop()
                 .skipMemoryCache(true)
                 .into(background);
 
-        view.findViewById<ImageView>(R.id.buttonLeft).setOnClickListener(this)
-        view.findViewById<ImageView>(R.id.buttonRight).setOnClickListener(this)
+        //view.findViewById<ImageView>(R.id.buttonLeft).setOnClickListener(this)
+        //view.findViewById<ImageView>(R.id.buttonRight).setOnClickListener(this)
 
         return view
     }
 
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+    /*override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
         val direction = arguments?.getSerializable(DIRECTION_ARG) as? Direction
         when (direction) {
             Direction.UP -> return CubeAnimation.create(
@@ -85,7 +86,7 @@ class EMMAInappPrismFragment: Fragment(), View.OnClickListener {
     private fun buttonPressed(direction: Direction) {
         arguments!!.putSerializable(DIRECTION_ARG, direction)
         val ft: FragmentTransaction = fragmentManager!!.beginTransaction()
-        ft.replace(R.id.layout_main, newInstance(direction))
+        //ft.replace(R.id.layout_main, newInstance(direction))
         ft.commit()
     }
 
@@ -96,5 +97,5 @@ class EMMAInappPrismFragment: Fragment(), View.OnClickListener {
            R.id.buttonRight -> buttonPressed(Direction.RIGHT)
            R.id.buttonCta -> print("click CTA")
        }
-    }
+    }*/
 }

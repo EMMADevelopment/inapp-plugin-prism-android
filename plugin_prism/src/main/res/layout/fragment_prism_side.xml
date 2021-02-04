@@ -5,9 +5,10 @@
     android:layout_height="match_parent">
 
     <ImageView
+        android:background="@color/design_default_color_secondary"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/background"></ImageView>
+        android:id="@+id/background"/>
 
     <ImageView
         android:id="@+id/buttonLeft"

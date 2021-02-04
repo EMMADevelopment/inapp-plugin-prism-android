@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import io.emma.android.model.EMMANativeAd
-import io.emma.plugin_prism.EMMAInappPlugin
+import io.emma.plugin_prism.EMMAInappPrismPlugin
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.showPrism).setOnClickListener {
-            val plugin = EMMAInappPlugin()
+            val plugin = EMMAInappPrismPlugin()
             plugin.show(this, EMMANativeAd())
         }
     }
