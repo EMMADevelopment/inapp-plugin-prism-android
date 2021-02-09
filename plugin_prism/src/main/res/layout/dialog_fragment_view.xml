@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="?actionBarSize"
-    tools:context=".EMMAInappPrismActivity">
+    tools:context=".EMMAInAppPrismActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:ignore="UselessParent">
 
-        <androidx.viewpager.widget.ViewPager
+        <androidx.viewpager2.widget.ViewPager2
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_centerInParent="true"

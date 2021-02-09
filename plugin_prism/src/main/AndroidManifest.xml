@@ -3,7 +3,8 @@
     package="io.emma.plugin_prism">
 
     <application>
-        <activity android:name=".EMMAInappPrismActivity" android:theme="@style/EMMATransparent">
+        <activity android:name=".EMMAInAppPrismActivity"
+            android:theme="@style/EMMATransparent" android:noHistory="true">
         </activity>
     </application>
 

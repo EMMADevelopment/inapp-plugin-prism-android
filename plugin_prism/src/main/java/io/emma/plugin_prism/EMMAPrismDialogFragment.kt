@@ -1,35 +1,47 @@
 package io.emma.plugin_prism
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.*
+import android.util.DisplayMetrics
+import android.view.Display
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
+import io.emma.android.activities.EMMAWebViewActivity
+import io.emma.android.controllers.EMMADeepLinkController
+import io.emma.android.model.EMMACampaign
+import io.emma.android.utils.EMMALog
 
 
-class EMMAPrismDialogFragment: DialogFragment(), ViewPager.OnPageChangeListener {
-    private var currentPage : Int = 0
-    private var mPreviousPosition : Int = 0
-    private var mIsEndOfCycle = false
+class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
+    private lateinit var pager: ViewPager2
+    private lateinit var prism: EMMAPrism
 
-    private lateinit var pagerAdapter : ScreenSlidePagerAdapter
-    private lateinit var pager: ViewPager
-    private val fragmentList = mutableListOf<Fragment>()
-
-    fun clearFragments() = fragmentList.clear()
-    fun addFragment(fragment: Fragment) = fragmentList.add(fragment)
-    fun addFragments(fragments: List<Fragment>) =fragmentList.addAll(fragments)
-
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-        override fun getItem(position: Int): Fragment = fragmentList[position % fragmentList.size]
-        override fun getCount(): Int = fragmentList.size
+    enum class PagerSelectionType {
+        MANUAL,
+        AUTOMATIC
     }
 
-    private inner class CubeTransformer : ViewPager.PageTransformer {
+    enum class PagerDirection {
+        LEFT,
+        RIGHT,
+    }
+
+    companion object {
+        const val TAG = "emma_inapp_prism_dialog"
+    }
+
+    fun addPrism(value: EMMAPrism) {
+        prism = value
+    }
+
+    private inner class CubeTransformer : ViewPager2.PageTransformer {
         override fun transformPage(view: View, position: Float) {
             val deltaY = 0.5F
 
@@ -39,61 +51,124 @@ class EMMAPrismDialogFragment: DialogFragment(), ViewPager.OnPageChangeListener 
         }
     }
 
+    @Suppress("Deprecation")
+    private fun getMetrics(): DisplayMetrics? {
+        val metrics = DisplayMetrics()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val display = activity?.display
+            display?.getRealMetrics(metrics)
+        } else {
+            val display = activity?.windowManager?.defaultDisplay
+            display?.getMetrics(metrics)
+        }
+
+        if (metrics.heightPixels > 0 && metrics.widthPixels > 0) {
+            return metrics
+        }
+        return null
+    }
+
     private fun resizeView() {
-        val height =  dialog?.window?.windowManager?.defaultDisplay?.height
-        val width =  dialog?.window?.windowManager?.defaultDisplay?.width
-        height?.let {
+        val metrics = getMetrics()
+        metrics?.let {
             val layoutParams = pager.layoutParams
-            layoutParams.height = (height * 0.7).toInt()
-            width?.let {
-                layoutParams.width = (width * 0.7).toInt()
-            }
+            layoutParams.height = (metrics.heightPixels * 0.6).toInt()
+            layoutParams.width = (metrics.widthPixels * 0.7).toInt()
             pager.layoutParams = layoutParams
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.emma_prism_content_main, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.dialog_fragment_view, container, false)
         pager = view.findViewById(R.id.pager)
         resizeView()
         dialog?.window?.setBackgroundDrawable(ColorDrawable(0))
         return view
     }
 
+    private fun nextPage(selectionType: PagerSelectionType, direction: PagerDirection? = null) {
+        if (pager.currentItem == 0) {
+            pager.setCurrentItem(prism.sides.size - 2, false)
+        } else if (pager.currentItem == prism.sides.size - 1) {
+            pager.setCurrentItem(1, false)
+        } else if(selectionType == PagerSelectionType.MANUAL && direction != null) {
+            val nextPage =  if (direction == PagerDirection.RIGHT) pager.currentItem + 1 else pager.currentItem - 1
+            pager.setCurrentItem(nextPage, true)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pagerAdapter = ScreenSlidePagerAdapter(childFragmentManager)
         pager.apply {
-            adapter = pagerAdapter
-            currentItem = 0
-            setPageTransformer(true, CubeTransformer())
-        }
-    }
-
-    fun selectPage(position : Int){
-        pager.currentItem = position
-    }
-
-    override fun onPageScrollStateChanged(state: Int) {
-        val pageCount = pager.adapter?.count
-        if (state == ViewPager.SCROLL_STATE_IDLE) {
-            if (mPreviousPosition == currentPage && !mIsEndOfCycle) {
-                if (currentPage == 0) {
-                    pageCount?.minus(1)?.let { pager.setCurrentItem(it, true) }
-                } else {
-                    pager.setCurrentItem(0, true)
+            adapter = EMMAEndlessViewPagerAdapter(
+                context,
+                this@EMMAPrismDialogFragment,
+                prism.sides
+            )
+            setCurrentItem(1, false)
+            setPageTransformer(CubeTransformer())
+            offscreenPageLimit = 1
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
+                    if (state == ViewPager2.SCROLL_STATE_IDLE || state == ViewPager2.SCROLL_STATE_DRAGGING) {
+                        nextPage(PagerSelectionType.AUTOMATIC)
+                    }
                 }
-                mIsEndOfCycle = true
-            } else {
-                mIsEndOfCycle = false
-            }
-            mPreviousPosition = currentPage
+            })
         }
     }
 
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+    private fun openBrowserInApp(cta: String) {
+        try {
+            val campaign = EMMACampaign(EMMACampaign.Type.NATIVEAD)
+            campaign.campaignUrl = cta
+            val intent = EMMAWebViewActivity.makeIntent(activity, campaign, true)
+            activity?.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            EMMALog.e(e)
+        }
+    }
 
-    override fun onPageSelected(position: Int) {
-        currentPage = position
+    private fun openBrowserOutApp(cta: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(cta)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+        } catch (e: ActivityNotFoundException) {
+            EMMALog.e(e)
+            openBrowserInApp(cta)
+        }
+    }
+
+    private fun ctaAction(cta: String?) {
+        cta?.let {
+            if (!cta.startsWith("http://") && !cta.startsWith("https://")) {
+                val deepLinkController = EMMADeepLinkController(activity)
+                deepLinkController.execute(cta)
+                dismiss()
+                return
+            }
+
+            if (prism.openInApp) {
+                openBrowserInApp(cta)
+            } else {
+                openBrowserOutApp(cta)
+            }
+        }
+    }
+
+    override fun onClick(view: View?) {
+        view?.let {
+            when(it.id) {
+                R.id.buttonLeft -> nextPage(PagerSelectionType.MANUAL, PagerDirection.LEFT)
+                R.id.buttonRight -> nextPage(PagerSelectionType.MANUAL, PagerDirection.RIGHT)
+                R.id.buttonCta -> ctaAction(view.tag as? String)
+            }
+        }
     }
 }

@@ -1,3 +1,5 @@
 package io.emma.plugin_prism
 
-data class EMMAPrism(val sides: Array<EMMAPrismSide>)
+import java.io.Serializable
+
+data class EMMAPrism(val campaignId: Int, val openInApp: Boolean, val sides: List<EMMAPrismSide>): Serializable

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EMMAPluginPrism</string>
+    <string name="show_prism">Show prism</string>
 </resources>

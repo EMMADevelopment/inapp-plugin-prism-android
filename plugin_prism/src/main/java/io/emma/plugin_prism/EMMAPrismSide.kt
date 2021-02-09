@@ -1,3 +1,6 @@
 package io.emma.plugin_prism
 
-data class EMMAPrismSide(val image: String)
+import java.io.Serializable
+
+
+data class EMMAPrismSide(val image: String,  val cta: String, val pos: Int): Serializable
