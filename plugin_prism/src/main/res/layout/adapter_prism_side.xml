@@ -55,7 +55,7 @@
 
     <Button
         android:layout_gravity="right|top"
-        android:id="@+id/closeButton"
+        android:id="@+id/buttonClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="25sp"

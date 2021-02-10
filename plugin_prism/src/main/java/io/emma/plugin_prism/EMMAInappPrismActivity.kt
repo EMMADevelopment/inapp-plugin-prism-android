@@ -3,13 +3,12 @@ package io.emma.plugin_prism
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 
 class EMMAInAppPrismActivity: FragmentActivity()  {
 
     private var dialogFragment : EMMAPrismDialogFragment? = null
+    private var prism: EMMAPrism? = null
 
     companion object {
         private const val PRISM = "prism"
@@ -17,7 +16,7 @@ class EMMAInAppPrismActivity: FragmentActivity()  {
         fun makeIntent(context: Activity, prism: EMMAPrism): Intent {
             val intent = Intent(context, EMMAInAppPrismActivity::class.java)
             intent.putExtra(PRISM, prism)
-            return intent;
+            return intent
         }
     }
 
@@ -29,10 +28,20 @@ class EMMAInAppPrismActivity: FragmentActivity()  {
         if (prism != null && prism.sides.isNotEmpty()) {
             dialogFragment = EMMAPrismDialogFragment().apply {
                 addPrism(prism)
-                isCancelable = false
+                isCancelable = prism.canClose
             }
 
             dialogFragment?.show(supportFragmentManager, EMMAPrismDialogFragment.TAG)
         }
+    }
+
+    override fun onBackPressed() {
+        prism?.let {
+            if (it.canClose) {
+                dialogFragment?.dismissAllowingStateLoss()
+            }
+        } ?:  dialogFragment?.dismissAllowingStateLoss()
+
+        super.onBackPressed()
     }
 }

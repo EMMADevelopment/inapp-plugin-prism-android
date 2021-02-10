@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -150,7 +149,7 @@ class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
             if (!cta.startsWith("http://") && !cta.startsWith("https://")) {
                 val deepLinkController = EMMADeepLinkController(activity)
                 deepLinkController.execute(cta)
-                dismiss()
+                dismissAllowingStateLoss()
                 return
             }
 
@@ -168,6 +167,7 @@ class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
                 R.id.buttonLeft -> nextPage(PagerSelectionType.MANUAL, PagerDirection.LEFT)
                 R.id.buttonRight -> nextPage(PagerSelectionType.MANUAL, PagerDirection.RIGHT)
                 R.id.buttonCta -> ctaAction(view.tag as? String)
+                R.id.buttonClose -> dismissAllowingStateLoss()
             }
         }
     }
