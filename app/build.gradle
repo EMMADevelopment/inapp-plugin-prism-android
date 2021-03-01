@@ -44,7 +44,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'io.emma:eMMaSDK:4.9.0-alpha2'
+    implementation 'io.emma:eMMaSDK:4.9.0-beta1'
 
 
     testImplementation 'junit:junit:4.+'

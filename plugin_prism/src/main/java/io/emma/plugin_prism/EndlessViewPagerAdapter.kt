@@ -6,16 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 import io.emma.android.controllers.EMMAImageController
 
-class EMMAEndlessViewPagerAdapter(
+internal class EndlessViewPagerAdapter(
         private val context: Context,
-        private val clickContext: EMMAPrismDialogFragment,
-        private val data: List<EMMAPrismSide>,
-) : RecyclerView.Adapter<EMMAEndlessViewPagerAdapter.ViewHolder>() {
+        private val clickContext: PrismDialogFragment,
+        private val data: List<PrismSide>,
+) : RecyclerView.Adapter<EndlessViewPagerAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val backgroundImage: ImageView = view.findViewById(R.id.backgroundImage)
@@ -24,18 +23,18 @@ class EMMAEndlessViewPagerAdapter(
         private val buttonCta: ImageView =  view.findViewById(R.id.buttonCta)
         private val buttonClose: Button = view.findViewById(R.id.buttonClose)
 
-        // temporal text to see the position on recyclerview
-        private val textView: TextView =  view.findViewById(R.id.text)
-
-        fun bind(prismSide: EMMAPrismSide) {
+        fun bind(prismSide: PrismSide) {
             EMMAImageController.loadImage(context, prismSide.image, backgroundImage)
-            buttonLeft.setOnClickListener(clickContext)
-            buttonRight.setOnClickListener(clickContext)
             buttonCta.setOnClickListener(clickContext)
             buttonClose.setOnClickListener(clickContext)
             buttonCta.tag = prismSide.cta
-            // temporal test assignation
-            textView.text = "${prismSide.pos}"
+
+            if (data.size > 1) {
+                buttonLeft.setOnClickListener(clickContext)
+                buttonRight.setOnClickListener(clickContext)
+                buttonLeft.visibility = View.VISIBLE
+                buttonRight.visibility = View.VISIBLE
+            }
         }
     }
 

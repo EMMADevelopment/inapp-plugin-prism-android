@@ -1,5 +1,8 @@
 package io.emma.plugin_prism
 
+import android.animation.Animator
+import android.animation.ValueAnimator
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
@@ -10,17 +13,19 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.fragment.app.DialogFragment
 import androidx.viewpager2.widget.ViewPager2
 import io.emma.android.activities.EMMAWebViewActivity
 import io.emma.android.controllers.EMMADeepLinkController
 import io.emma.android.model.EMMACampaign
+import io.emma.android.plugins.EMMAInAppPlugin
 import io.emma.android.utils.EMMALog
 
 
-class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
+internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
     private lateinit var pager: ViewPager2
-    private lateinit var prism: EMMAPrism
+    private lateinit var prism: Prism
 
     enum class PagerSelectionType {
         MANUAL,
@@ -36,7 +41,7 @@ class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
         const val TAG = "emma_inapp_prism_dialog"
     }
 
-    fun addPrism(value: EMMAPrism) {
+    fun addPrism(value: Prism) {
         prism = value
     }
 
@@ -96,16 +101,22 @@ class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
             pager.setCurrentItem(1, false)
         } else if(selectionType == PagerSelectionType.MANUAL && direction != null) {
             val nextPage =  if (direction == PagerDirection.RIGHT) pager.currentItem + 1 else pager.currentItem - 1
-            pager.setCurrentItem(nextPage, true)
+            pager.setCurrentItem(nextPage, 300)
         }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.setCanceledOnTouchOutside(false)
+        return dialog
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         pager.apply {
-            adapter = EMMAEndlessViewPagerAdapter(
+            adapter = EndlessViewPagerAdapter(
                 context,
-                this@EMMAPrismDialogFragment,
+                this@PrismDialogFragment,
                 prism.sides
             )
             setCurrentItem(1, false)
@@ -120,6 +131,8 @@ class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
                 }
             })
         }
+
+        EMMAInAppPlugin.sendImpression(prism.campaign)
     }
 
     private fun openBrowserInApp(cta: String) {
@@ -158,6 +171,8 @@ class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
             } else {
                 openBrowserOutApp(cta)
             }
+
+           EMMAInAppPlugin.sendInAppClick(prism.campaign)
         }
     }
 
@@ -170,5 +185,26 @@ class EMMAPrismDialogFragment: DialogFragment(), View.OnClickListener {
                 R.id.buttonClose -> dismissAllowingStateLoss()
             }
         }
+    }
+
+    private fun ViewPager2.setCurrentItem(item: Int, duration: Long) {
+        val pxToDrag: Int = width * (item - currentItem)
+        val animator = ValueAnimator.ofInt(0, pxToDrag)
+        var previousValue = 0
+        animator.addUpdateListener { valueAnimator ->
+            val currentValue = valueAnimator.animatedValue as Int
+            val currentPxToDrag = (currentValue - previousValue).toFloat()
+            fakeDragBy(-currentPxToDrag)
+            previousValue = currentValue
+        }
+        animator.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator?) { beginFakeDrag() }
+            override fun onAnimationEnd(animation: Animator?) { endFakeDrag() }
+            override fun onAnimationCancel(animation: Animator?) { /* Ignored */ }
+            override fun onAnimationRepeat(animation: Animator?) { /* Ignored */ }
+        })
+        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.duration = duration
+        animator.start()
     }
 }

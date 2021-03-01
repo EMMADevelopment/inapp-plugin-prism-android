@@ -19,8 +19,12 @@
         android:layout_gravity="left|center"
         android:src="@drawable/ic_left"
         android:contentDescription="@null"
-        android:padding="6dp"
+        android:paddingEnd="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
         android:background="?attr/selectableItemBackground"
+        android:visibility="gone"
         />
 
     <ImageView
@@ -29,9 +33,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"
         android:src="@drawable/ic_right"
-        android:padding="8dp"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
         android:contentDescription="@null"
         android:background="?attr/selectableItemBackground"
+        android:visibility="gone"
         />
 
     <ImageView
@@ -43,15 +51,6 @@
         android:contentDescription="@null"
         android:background="?attr/selectableItemBackground"
         />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:layout_gravity="center"
-        android:textSize="50sp"
-        android:id="@+id/text"/>
-
 
     <Button
         android:layout_gravity="right|top"

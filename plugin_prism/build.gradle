@@ -16,8 +16,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 8
-        versionName "0.8"
+        versionCode 13
+        versionName "0.13"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -44,7 +44,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    compileOnly 'io.emma:eMMaSDK:4.9.0-alpha2'
+    compileOnly 'io.emma:eMMaSDK:4.9.0-beta1'
 }
 
 Properties localProperties = new Properties()

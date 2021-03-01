@@ -5,16 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 
-class EMMAInAppPrismActivity: FragmentActivity()  {
+internal class InAppPrismActivity: FragmentActivity()  {
 
-    private var dialogFragment : EMMAPrismDialogFragment? = null
-    private var prism: EMMAPrism? = null
+    private var dialogFragment : PrismDialogFragment? = null
+    private var prism: Prism? = null
 
     companion object {
         private const val PRISM = "prism"
 
-        fun makeIntent(context: Activity, prism: EMMAPrism): Intent {
-            val intent = Intent(context, EMMAInAppPrismActivity::class.java)
+        fun makeIntent(context: Activity, prism: Prism): Intent {
+            val intent = Intent(context, InAppPrismActivity::class.java)
             intent.putExtra(PRISM, prism)
             return intent
         }
@@ -24,15 +24,16 @@ class EMMAInAppPrismActivity: FragmentActivity()  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_emma_prism)
 
-        val prism = intent.getSerializableExtra(PRISM) as? EMMAPrism
+        val prism = intent.getSerializableExtra(PRISM) as? Prism
         if (prism != null && prism.sides.isNotEmpty()) {
-            dialogFragment = EMMAPrismDialogFragment().apply {
+            dialogFragment = PrismDialogFragment().apply {
                 addPrism(prism)
                 isCancelable = prism.canClose
             }
-
-            dialogFragment?.show(supportFragmentManager, EMMAPrismDialogFragment.TAG)
         }
+
+        dialogFragment?.show(supportFragmentManager, PrismDialogFragment.TAG)
+
     }
 
     override fun onBackPressed() {
@@ -41,7 +42,6 @@ class EMMAInAppPrismActivity: FragmentActivity()  {
                 dialogFragment?.dismissAllowingStateLoss()
             }
         } ?:  dialogFragment?.dismissAllowingStateLoss()
-
         super.onBackPressed()
     }
 }
