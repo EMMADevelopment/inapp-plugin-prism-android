@@ -17,12 +17,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left|center"
-        android:src="@drawable/ic_left"
+        android:src="@drawable/emma_prism_ic_left"
         android:contentDescription="@null"
-        android:paddingEnd="8dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp"
         android:background="?attr/selectableItemBackground"
         android:visibility="gone"
         />
@@ -32,11 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"
-        android:src="@drawable/ic_right"
-        android:paddingStart="8dp"
-        android:paddingLeft="8dp"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp"
+        android:src="@drawable/emma_prism_ic_right"
         android:contentDescription="@null"
         android:background="?attr/selectableItemBackground"
         android:visibility="gone"
@@ -47,26 +39,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
-        android:src="@drawable/ic_up"
+        android:src="@drawable/emma_prism_ic_see"
+        android:layout_marginBottom="3dp"
         android:contentDescription="@null"
         android:background="?attr/selectableItemBackground"
         />
 
-    <Button
+    <ImageView
         android:layout_gravity="right|top"
         android:id="@+id/buttonClose"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:textColor="@android:color/white"
-        android:minWidth="30dp"
-        android:minHeight="15dp"
-        android:text="x"
+        android:layout_marginTop="3dp"
         android:layout_marginRight="3dp"
         android:layout_marginEnd="3dp"
-        android:textAllCaps="false"
+        android:layout_height="wrap_content"
+        android:src="@drawable/emma_prism_ic_close"
         android:contentDescription="@null"
-        android:background="?attr/selectableItemBackground"
-        />
+        android:background="?attr/selectableItemBackground" />
 
 </FrameLayout>

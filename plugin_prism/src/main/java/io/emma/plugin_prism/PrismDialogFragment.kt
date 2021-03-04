@@ -131,8 +131,8 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
                 }
             })
         }
-
         EMMAInAppPlugin.sendImpression(prism.campaign)
+        EMMAInAppPlugin.invokeShownListeners(prism.campaign)
     }
 
     private fun openBrowserInApp(cta: String) {
@@ -182,7 +182,10 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
                 R.id.buttonLeft -> nextPage(PagerSelectionType.MANUAL, PagerDirection.LEFT)
                 R.id.buttonRight -> nextPage(PagerSelectionType.MANUAL, PagerDirection.RIGHT)
                 R.id.buttonCta -> ctaAction(view.tag as? String)
-                R.id.buttonClose -> dismissAllowingStateLoss()
+                R.id.buttonClose -> {
+                    EMMAInAppPlugin.invokeCloseListener(prism.campaign)
+                    dismissAllowingStateLoss()
+                }
             }
         }
     }

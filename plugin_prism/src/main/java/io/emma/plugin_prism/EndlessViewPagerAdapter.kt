@@ -21,7 +21,7 @@ internal class EndlessViewPagerAdapter(
         private val buttonRight: ImageView = view.findViewById(R.id.buttonRight)
         private val buttonLeft: ImageView = view.findViewById(R.id.buttonLeft)
         private val buttonCta: ImageView =  view.findViewById(R.id.buttonCta)
-        private val buttonClose: Button = view.findViewById(R.id.buttonClose)
+        private val buttonClose: ImageView = view.findViewById(R.id.buttonClose)
 
         fun bind(prismSide: PrismSide) {
             EMMAImageController.loadImage(context, prismSide.image, backgroundImage)

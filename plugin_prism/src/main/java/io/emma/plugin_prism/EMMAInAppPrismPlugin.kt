@@ -10,7 +10,7 @@ import io.emma.android.utils.EMMALog
 
 class EMMAInAppPrismPlugin: EMMAInAppPlugin() {
 
-    override fun getType(): String = "emma-plugin-prism"
+    override fun getId(): String = "emma-plugin-prism"
 
     override fun show(context: Activity?, nativeAd: EMMANativeAd) {
         if (EMMA.getInstance().sdkBuild < 127) {

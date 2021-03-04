@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
+import io.emma.android.plugins.EMMAInAppPlugin
+import io.emma.android.utils.EMMALog
 
 internal class InAppPrismActivity: FragmentActivity()  {
 
@@ -30,15 +32,17 @@ internal class InAppPrismActivity: FragmentActivity()  {
                 addPrism(prism)
                 isCancelable = prism.canClose
             }
+            dialogFragment?.show(supportFragmentManager, PrismDialogFragment.TAG)
+        } else {
+            EMMALog.w("Invalid prism or empty content. Skipping show")
+            finish()
         }
-
-        dialogFragment?.show(supportFragmentManager, PrismDialogFragment.TAG)
-
     }
 
     override fun onBackPressed() {
         prism?.let {
             if (it.canClose) {
+                EMMAInAppPlugin.invokeCloseListener(it.campaign)
                 dialogFragment?.dismissAllowingStateLoss()
             }
         } ?:  dialogFragment?.dismissAllowingStateLoss()
