@@ -10,7 +10,7 @@ import io.emma.android.utils.EMMALog
 
 class EMMAInAppPrismPlugin: EMMAInAppPlugin() {
 
-    override fun getId(): String = "emma-plugin-prism"
+    override fun getId(): String = "emma-plugin-prisma"
 
     override fun show(context: Activity?, nativeAd: EMMANativeAd) {
         if (EMMA.getInstance().sdkBuild < 127) {
@@ -65,7 +65,7 @@ class EMMAInAppPrismPlugin: EMMAInAppPlugin() {
         val openInApp = nativeAd.showOnWebView()
 
         val content = nativeAd.nativeAdContent
-        val container = content["Container"]
+        val container = content["container"]
 
         val prismSides = mutableListOf<PrismSide>()
         container?.fieldContainer?.forEach { containerBlock ->

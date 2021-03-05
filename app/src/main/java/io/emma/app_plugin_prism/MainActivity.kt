@@ -31,12 +31,12 @@ class MainActivity : AppCompatActivity() {
         side2Cta.fieldValue = "https://emma.io"
 
         val container = EMMANativeAdField()
-        container.fieldName = "Container"
+        container.fieldName = "container"
         container.fieldContainer = mutableListOf(
             mapOf(side1Image.fieldName to side1Image, side1Cta.fieldName to side1Cta),
             mapOf(side2Image.fieldName to side2Image, side2Cta.fieldName to side2Cta)
         )
-        nativeAd.setFields(mapOf("Container" to container))
+        nativeAd.setFields(mapOf("container" to container))
 
         return nativeAd
     }
