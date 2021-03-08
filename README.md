@@ -19,7 +19,7 @@ For integrate this plugin add the following lines to build.grade:
 dependencies {
    ...
    implementation 'io.emma:eMMaSDK:4.9.0'
-   implementation 'io.emma:inapp-plugin-prism:1.0',
+   implementation 'io.emma:inapp-plugin-prism:1.0'
 }
 ```
 
@@ -28,7 +28,6 @@ dependencies {
 Import the library in Application class and add plugin class to SDK.
 
 ``` kotlin
-
 import io.emma.android.EMMA
 import io.emma.plugin_prism.EMMAInAppPrismPlugin
  
