@@ -67,6 +67,8 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
         }
 
         if (metrics.heightPixels > 0 && metrics.widthPixels > 0) {
+            metrics.heightPixels = (metrics.heightPixels * 0.6).toInt()
+            metrics.widthPixels = (metrics.widthPixels * 0.7).toInt()
             return metrics
         }
         return null
@@ -76,8 +78,8 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
         val metrics = getMetrics()
         metrics?.let {
             val layoutParams = pager.layoutParams
-            layoutParams.height = (metrics.heightPixels * 0.6).toInt()
-            layoutParams.width = (metrics.widthPixels * 0.7).toInt()
+            layoutParams.height = metrics.heightPixels
+            layoutParams.width = metrics.widthPixels
             pager.layoutParams = layoutParams
         }
     }
@@ -115,13 +117,13 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         pager.apply {
             adapter = EndlessViewPagerAdapter(
-                context,
                 this@PrismDialogFragment,
-                prism.sides
+                prism.sides,
+                getMetrics()
             )
             setCurrentItem(1, false)
-            setPageTransformer(CubeTransformer())
             offscreenPageLimit = 1
+            setPageTransformer(CubeTransformer())
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
@@ -176,16 +178,26 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
         }
     }
 
+    private fun close() {
+        EMMAInAppPlugin.invokeCloseListener(prism.campaign)
+        dismissAllowingStateLoss()
+        activity?.let {
+            if (it.isFinishing ||
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && it.isDestroyed)) {
+                EMMALog.d("Cannot finish the activity it is finished or destroyed")
+                return
+            }
+            it.finish()
+        }
+    }
+
     override fun onClick(view: View?) {
         view?.let {
             when(it.id) {
                 R.id.buttonLeft -> nextPage(PagerSelectionType.MANUAL, PagerDirection.LEFT)
                 R.id.buttonRight -> nextPage(PagerSelectionType.MANUAL, PagerDirection.RIGHT)
                 R.id.buttonCta -> ctaAction(view.tag as? String)
-                R.id.buttonClose -> {
-                    EMMAInAppPlugin.invokeCloseListener(prism.campaign)
-                    dismissAllowingStateLoss()
-                }
+                R.id.buttonClose -> close()
             }
         }
     }
