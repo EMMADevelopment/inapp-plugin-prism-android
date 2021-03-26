@@ -42,7 +42,7 @@ import io.emma.plugin_prism.EMMAInAppPrismPlugin
 
 ```
 
-In an Activity or Fragment request the available prism (If there are many prism avaiable only is showed the latest created).
+In an Activity or Fragment request the available prism (If there are many prism avaiable only is shown the latest created).
 
 ``` kotlin
 import io.emma.android.EMMA
