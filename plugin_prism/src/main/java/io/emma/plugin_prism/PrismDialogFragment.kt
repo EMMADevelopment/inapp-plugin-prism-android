@@ -17,7 +17,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.fragment.app.DialogFragment
 import androidx.viewpager2.widget.ViewPager2
 import io.emma.android.activities.EMMAWebViewActivity
-import io.emma.android.controllers.EMMADeepLinkController
+import io.emma.android.controllers.EMMALinkController
 import io.emma.android.model.EMMACampaign
 import io.emma.android.plugins.EMMAInAppPlugin
 import io.emma.android.utils.EMMALog
@@ -141,8 +141,10 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
         try {
             val campaign = EMMACampaign(EMMACampaign.Type.NATIVEAD)
             campaign.campaignUrl = cta
-            val intent = EMMAWebViewActivity.makeIntent(activity, campaign, true)
-            activity?.startActivity(intent)
+            activity?.let {
+                val intent = EMMAWebViewActivity.makeIntent(it.baseContext, campaign, true)
+                it.startActivity(intent)
+            }
         } catch (e: ActivityNotFoundException) {
             EMMALog.e(e)
         }
@@ -162,7 +164,7 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
     private fun ctaAction(cta: String?) {
         cta?.let {
             if (!cta.startsWith("http://") && !cta.startsWith("https://")) {
-                val deepLinkController = EMMADeepLinkController(activity)
+                val deepLinkController = EMMALinkController(activity)
                 deepLinkController.execute(cta)
                 dismissAllowingStateLoss()
                 return

@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         val side1Cta = EMMANativeAdField()
         side1Cta.fieldName  = "CTA"
-        side1Cta.fieldValue = "https://google.es"
+        side1Cta.fieldValue = "emmaio://settings"
 
         val side2Image = EMMANativeAdField()
         side2Image.fieldName = "Main picture"
