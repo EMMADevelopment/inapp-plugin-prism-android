@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
 
         val side1Image = EMMANativeAdField()
         side1Image.fieldName  = "Main picture"
-        side1Image.fieldValue = "https://i.picsum.photos/id/586/300/700.jpg?hmac=TKBELClTbUvaXq5NHUpCVnnhssZ3tYTSLTYBi6rPo5Q"
+        side1Image.fieldValue = "https://i.imgur.com/W3FHL99.jpeg"
 
         val side1Cta = EMMANativeAdField()
         side1Cta.fieldName  = "CTA"
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         val side2Image = EMMANativeAdField()
         side2Image.fieldName = "Main picture"
-        side2Image.fieldValue = "https://i.picsum.photos/id/666/300/700.jpg?hmac=mXEaSU1_1gEAtK3z-beAT7GyWGt8oYsa34QOXLBx-qY"
+        side2Image.fieldValue = "https://i.imgur.com/cQP38OS.jpeg"
 
         val side2Cta = EMMANativeAdField()
         side2Cta.fieldName = "CTA"

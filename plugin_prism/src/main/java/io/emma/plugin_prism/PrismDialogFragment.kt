@@ -25,7 +25,7 @@ import io.emma.android.utils.EMMALog
 
 internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
     private lateinit var pager: ViewPager2
-    private lateinit var prism: Prism
+    private var prism: Prism? = null
 
     enum class PagerSelectionType {
         MANUAL,
@@ -39,10 +39,6 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
 
     companion object {
         const val TAG = "emma_inapp_prism_dialog"
-    }
-
-    fun addPrism(value: Prism) {
-        prism = value
     }
 
     private inner class CubeTransformer : ViewPager2.PageTransformer {
@@ -84,6 +80,16 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
         }
     }
 
+
+    @Suppress("Deprecation")
+    private fun getPrism(): Prism? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable(InAppPrismActivity.PRISM, Prism::class.java)
+        } else {
+            arguments?.getSerializable(InAppPrismActivity.PRISM) as? Prism
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -93,13 +99,15 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
         pager = view.findViewById(R.id.pager)
         resizeView()
         dialog?.window?.setBackgroundDrawable(ColorDrawable(0))
+        prism = getPrism()
         return view
     }
 
     private fun nextPage(selectionType: PagerSelectionType, direction: PagerDirection? = null) {
+        val sidesSize = prism?.sides?.size ?: 0
         if (pager.currentItem == 0) {
-            pager.setCurrentItem(prism.sides.size - 2, false)
-        } else if (pager.currentItem == prism.sides.size - 1) {
+            pager.setCurrentItem( sidesSize - 2, false)
+        } else if (pager.currentItem == sidesSize - 1) {
             pager.setCurrentItem(1, false)
         } else if(selectionType == PagerSelectionType.MANUAL && direction != null) {
             val nextPage =  if (direction == PagerDirection.RIGHT) pager.currentItem + 1 else pager.currentItem - 1
@@ -108,33 +116,41 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
+        val dialog = object : Dialog(requireContext(), theme) {
+            override fun onBackPressed() {
+                close()
+            }
+        }
         dialog.setCanceledOnTouchOutside(false)
         return dialog
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pager.apply {
-            adapter = EndlessViewPagerAdapter(
-                this@PrismDialogFragment,
-                prism.sides,
-                getMetrics()
-            )
-            setCurrentItem(1, false)
-            offscreenPageLimit = 1
-            setPageTransformer(CubeTransformer())
-            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageScrollStateChanged(state: Int) {
-                    super.onPageScrollStateChanged(state)
-                    if (state == ViewPager2.SCROLL_STATE_IDLE || state == ViewPager2.SCROLL_STATE_DRAGGING) {
-                        nextPage(PagerSelectionType.AUTOMATIC)
+        prism?.let { prism ->
+            pager.apply {
+                adapter = EndlessViewPagerAdapter(
+                    this@PrismDialogFragment,
+                    prism.sides,
+                    getMetrics()
+                )
+                setCurrentItem(1, false)
+                offscreenPageLimit = 1
+                setPageTransformer(CubeTransformer())
+                registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                    override fun onPageScrollStateChanged(state: Int) {
+                        super.onPageScrollStateChanged(state)
+                        if (state == ViewPager2.SCROLL_STATE_IDLE || state == ViewPager2.SCROLL_STATE_DRAGGING) {
+                            nextPage(PagerSelectionType.AUTOMATIC)
+                        }
                     }
-                }
-            })
+                })
+            }
+            EMMAInAppPlugin.sendImpression(prism.campaign)
+            EMMAInAppPlugin.invokeShownListeners(prism.campaign)
+        } ?: run {
+            close()
         }
-        EMMAInAppPlugin.sendImpression(prism.campaign)
-        EMMAInAppPlugin.invokeShownListeners(prism.campaign)
     }
 
     private fun openBrowserInApp(cta: String) {
@@ -170,22 +186,26 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
                 return
             }
 
-            if (prism.openInApp) {
-                openBrowserInApp(cta)
-            } else {
-                openBrowserOutApp(cta)
-            }
+            prism?.let {
+                if (it.openInApp) {
+                    openBrowserInApp(cta)
+                } else {
+                    openBrowserOutApp(cta)
+                }
 
-           EMMAInAppPlugin.sendInAppClick(prism.campaign)
+                EMMAInAppPlugin.sendInAppClick(it.campaign)
+            }
         }
     }
 
     private fun close() {
-        EMMAInAppPlugin.invokeCloseListener(prism.campaign)
+        prism?.let { prism ->
+            EMMAInAppPlugin.invokeCloseListener(prism.campaign)
+        }
+        
         dismissAllowingStateLoss()
         activity?.let {
-            if (it.isFinishing ||
-                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && it.isDestroyed)) {
+            if (it.isFinishing || it.isDestroyed) {
                 EMMALog.d("Cannot finish the activity it is finished or destroyed")
                 return
             }
@@ -215,13 +235,15 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
             previousValue = currentValue
         }
         animator.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animation: Animator?) { beginFakeDrag() }
-            override fun onAnimationEnd(animation: Animator?) { endFakeDrag() }
-            override fun onAnimationCancel(animation: Animator?) { /* Ignored */ }
-            override fun onAnimationRepeat(animation: Animator?) { /* Ignored */ }
+            override fun onAnimationStart(animation: Animator) { beginFakeDrag() }
+            override fun onAnimationEnd(animation: Animator) { endFakeDrag() }
+            override fun onAnimationCancel(animation: Animator) { /* Ignored */ }
+            override fun onAnimationRepeat(animation: Animator) { /* Ignored */ }
         })
         animator.interpolator = AccelerateDecelerateInterpolator()
         animator.duration = duration
         animator.start()
     }
+
+
 }

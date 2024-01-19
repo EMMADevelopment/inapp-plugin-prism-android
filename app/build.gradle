@@ -10,12 +10,12 @@ repositories {
 
 
 android {
-    compileSdkVersion 31
+    compileSdk 34
 
     defaultConfig {
         applicationId "io.emma.app_plugin_prism"
-        minSdkVersion 16
-        targetSdkVersion 31
+        minSdkVersion 19
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
