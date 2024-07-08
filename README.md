@@ -18,7 +18,8 @@ For integrate this plugin add the following lines to build.grade:
 
 dependencies {
    ...
-   implementation 'io.emma:eMMaSDK:4.12.1'
+   // Use the latest version available
+   implementation 'io.emma:eMMaSDK:4.13.0'
    implementation 'io.emma:inapp-plugin-prism:1.2'
 }
 ```
