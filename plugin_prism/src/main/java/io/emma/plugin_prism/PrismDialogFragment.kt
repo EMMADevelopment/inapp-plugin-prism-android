@@ -201,6 +201,7 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
     private fun close() {
         prism?.let { prism ->
             EMMAInAppPlugin.invokeCloseListener(prism.campaign)
+            EMMAInAppPlugin.sendInAppDismissedClick(prism.campaign)
         }
         
         dismissAllowingStateLoss()

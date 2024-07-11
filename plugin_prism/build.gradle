@@ -11,11 +11,11 @@ repositories {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdk 33
+        minSdkVersion 21
+        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -34,6 +34,8 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    namespace "io.emma.plugin_prism"
 }
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -42,7 +44,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
-    compileOnly 'io.emma:eMMaSDK:4.11.0'
+    compileOnly 'io.emma:eMMaSDK:4.14.0'
 }
 
 Properties localProperties = new Properties()
