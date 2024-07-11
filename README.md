@@ -8,6 +8,10 @@ You can create your own plugin through native ad engine.
 
 ## Installation
 
+> **Warning**
+>
+> Version 1.3 depends of EMMA SDK 4.14.0 if your project cannot update force package tag to previous version 1.2
+
 For integrate this plugin add the following lines to build.grade:
 
 ```groovy
