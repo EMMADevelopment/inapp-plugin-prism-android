@@ -180,6 +180,7 @@ internal class PrismDialogFragment: DialogFragment(), View.OnClickListener {
     private fun ctaAction(cta: String?) {
         cta?.let {
             if (!cta.startsWith("http://") && !cta.startsWith("https://")) {
+                prism?.let { EMMAInAppPlugin.sendInAppClick(it.campaign) }
                 val deepLinkController = EMMALinkController(activity)
                 deepLinkController.execute(cta)
                 dismissAllowingStateLoss()
